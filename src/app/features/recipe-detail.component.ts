@@ -1,87 +1,157 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { RecipeService } from '../core/recipe.service'
+import { RecipeService } from '../core/recipe.service';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { FavoritesService } from '../core/favorites.service';
 
 @Component({
   selector: 'app-recipe-detail',
+  standalone: true,
   imports: [CommonModule, RouterModule],
   template: `
-<div class="container py-4" *ngIf="recipe(); else errorTpl">
+<div class="detail-container py-5" *ngIf="recipe(); else errorTpl">
+  <!-- BACK BUTTON -->
+  <div class="mb-4 text-center text-md-start">
+    <a routerLink="/" class="btn btn-outline-main">
+      ← Back to search
+    </a>
+  </div>
 
-  <!-- 🔲 ROW: immagine + info -->
-  <div class="row mb-4 align-items-start">
-    <!-- colonna immagine -->
-    <div class="col-12 col-md-4 mb-3 mb-md-0">
-      <img 
+  <!-- IMAGE + INFO -->
+  <div class="row align-items-start mb-5">
+    <div class="col-12 col-md-4 mb-4 mb-md-0 text-center">
+      <img
         [src]="recipe().strMealThumb"
         [alt]="recipe().strMeal"
-        class="img-fluid rounded shadow"
+        class="img-fluid detail-img"
       />
     </div>
-
-    <!-- colonna testo a destra -->
     <div class="col-12 col-md-8">
-      <h2 class="mb-3">{{ recipe().strMeal }}</h2>
-      
-      <!-- 🔙 BACK BUTTON -->
-      <div class="mb-3">
-        <a routerLink="/" class="btn btn-outline-secondary">
-          ← Back to search
-        </a>
+      <h2 class="detail-title mb-3">{{ recipe().strMeal }}</h2>
+
+      <div class="info-tags mb-4">
+        <span class="tag"><strong>Category:</strong> {{ recipe().strCategory }}</span>
+        <span class="tag"><strong>Area:</strong> {{ recipe().strArea }}</span>
       </div>
 
-      <div class="row mb-3">
-        <div>
-          <strong>Category:</strong> {{ recipe().strCategory }}
-        </div>
-        <div>
-          <strong>Area:</strong> {{ recipe().strArea }}
-        </div>
-      </div>
-
-      <button 
-        class="btn btn-warning me-2 mb-2"
+      <button
+        class="btn btn-main me-3 mb-3"
         (click)="toggleFavorite()"
       >
-        <span *ngIf="isFav(); else notFav">❤️ Remove from favorites</span>
+        <ng-container *ngIf="isFav(); else notFav">
+          ❤️ Remove from favorites
+        </ng-container>
         <ng-template #notFav>🤍 Add to favorites</ng-template>
       </button>
 
-      <a 
-        *ngIf="recipe().strYoutube" 
-        [href]="recipe().strYoutube" 
-        target="_blank" 
-        class="btn btn-outline-danger mb-2"
+      <a
+        *ngIf="recipe().strYoutube"
+        [href]="recipe().strYoutube"
+        target="_blank"
+        class="btn btn-outline-main mb-3"
       >
         ▶ Watch on YouTube
       </a>
-
     </div>
   </div>
 
-  <!-- 🔸 INGREDIENTS -->
-  <h4 class="mt-4">Ingredients</h4>
-  <ul>
-    <li *ngFor="let ing of getIngredients()">{{ ing }}</li>
-  </ul>
+  <!-- INGREDIENTS -->
+  <section class="mb-5">
+    <h4 class="section-title">Ingredients</h4>
+    <ul class="list-unstyled ingredients-list">
+      <li *ngFor="let ing of getIngredients()">{{ ing }}</li>
+    </ul>
+  </section>
 
-  <!-- 🔸 INSTRUCTIONS -->
-  <h4 class="mt-4">Instructions</h4>
-  <p style="white-space: pre-line">{{ recipe().strInstructions }}</p>
+  <!-- INSTRUCTIONS -->
+  <section>
+    <h4 class="section-title">Instructions</h4>
+    <p class="instructions" style="white-space: pre-line">{{ recipe().strInstructions }}</p>
+  </section>
 </div>
 
 <ng-template #errorTpl>
   <div class="alert alert-danger mt-4 text-center">
     {{ error() }}
     <br />
-    <a routerLink="/" class="btn btn-outline-secondary mt-3">← Back to search</a>
+    <a routerLink="/" class="btn btn-outline-main mt-3">← Back to search</a>
   </div>
 </ng-template>
   `,
-  styles: ``
+  styles: [`
+:host {
+  display: block;
+  background-color: #ffffff;
+  color: #222222;
+  font-family: 'Montserrat', sans-serif;
+}
+.detail-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+.btn-outline-main {
+  color: #D64541;
+  border: 2px solid #D64541;
+  border-radius: 0.5rem;
+}
+.btn-outline-main:hover {
+  background-color: #D64541;
+  color: #ffffff;
+}
+.btn-main {
+  background-color: #D64541;
+  border: none;
+  border-radius: 0.5rem;
+  color: #ffffff;
+}
+.btn-main:hover {
+  background-color: #A2342F;
+}
+.detail-img {
+  border-radius: 1rem;
+  max-width: 100%;
+  height: auto;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+}
+.detail-title {
+  font-size: 2rem;
+  color: #D64541;
+  margin: 0;
+}
+.info-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.tag {
+  background-color: #4A90E2;
+  color: #ffffff;
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.9rem;
+}
+.section-title {
+  font-size: 1.75rem;
+  color: #4A90E2;
+  margin-bottom: 1rem;
+}
+.ingredients-list li {
+  margin-bottom: 0.5rem;
+}
+.instructions {
+  line-height: 1.6;
+}
+@media (max-width: 768px) {
+  .info-tags {
+    justify-content: center;
+  }
+  .detail-container .row {
+    text-align: center;
+  }
+}
+`]
 })
 export class RecipeDetailComponent implements OnInit {
   recipe = signal<any | null>(null);
@@ -92,6 +162,7 @@ export class RecipeDetailComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private favoritesService = inject(FavoritesService);
 
+  constructor(private router: Router) {}
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
