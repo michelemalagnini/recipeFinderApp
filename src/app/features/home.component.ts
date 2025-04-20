@@ -107,13 +107,16 @@ export class HomeComponent {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
       const { query, results } = JSON.parse(stored);
-      this.query.set(query);
-      this.recipes.set(results);
-      this.isDefaultSearch.set(false);
-    } else {
-      this.search('pork');
-      this.isDefaultSearch.set(true);
+      if (results && results.length > 0) {
+        this.query.set(query);
+        this.recipes.set(results);
+        this.isDefaultSearch.set(false);
+        return;
+      }
     }
+
+    this.search('pork');
+    this.isDefaultSearch.set(true);
   }
 
   search(query: string) {
@@ -123,27 +126,22 @@ export class HomeComponent {
       this.recipes.set([]);
       return;
     }
-  
     this.query.set(trimmed);
     this.error.set(null);
     this.loading.set(true);
     this.isDefaultSearch.set(false);
-  
     this.recipeService.searchRecipes(trimmed).subscribe({
       next: (res: RecipeResponse) => {
         const result = res.meals || [];
         this.recipes.set(result);
-  
         if (!res.meals) {
           this.error.set('No recipe found.');
         } else {
-          // ✅ Salva solo se ci sono risultati
           localStorage.setItem(STORAGE_KEY, JSON.stringify({
             query: trimmed,
             results: result
           }));
         }
-  
         this.loading.set(false);
       },
       error: () => {
@@ -152,7 +150,6 @@ export class HomeComponent {
       }
     });
   }
-  
 
   goToRecipe(idMeal: string) {
     this.router.navigate(['/recipe', idMeal]);
