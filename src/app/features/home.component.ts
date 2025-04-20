@@ -6,11 +6,12 @@ import { RouterModule, Router } from '@angular/router';
 import { FavoritesService } from '../core/favorites.service';
 import { NavbarComponent } from '../shared/navbar.component';
 import { SearchFormComponent } from '../shared/search-form.component';
+import { RecipeCardComponent } from '../shared/recipe-card.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, NavbarComponent, SearchFormComponent],
+  imports: [CommonModule, FormsModule, RouterModule, NavbarComponent, SearchFormComponent, RecipeCardComponent],
   template: `
 <div class="home-container py-5">
   <!-- NAVBAR -->
@@ -18,17 +19,6 @@ import { SearchFormComponent } from '../shared/search-form.component';
 
 
   <!-- SEARCH FORM -->
-  <!-- <form (submit)="search(); $event.preventDefault()" class="search-form mb-5 text-center">
-    <div class="input-group justify-content-center">
-      <input
-        [(ngModel)]="query"
-        name="query"
-        class="form-control input-main"
-        placeholder="Search recipes..."
-      >
-      <button class="btn btn-main" type="submit">Search</button>
-    </div>
-  </form> -->
   <app-search-form (searchSubmit)="search($event)"></app-search-form>
 
 
@@ -38,18 +28,10 @@ import { SearchFormComponent } from '../shared/search-form.component';
 
   <!-- FAVORITES PREVIEW -->
   <section *ngIf="favoritesPreview().length" class="favorites-section mb-5 text-center">
-    <h2 class="section-title">⭐ Your Favorites</h2>
+    <h2 class="section-title">⭐ Your first 3 favorites</h2>
     <div class="row g-4 justify-content-center">
       <div class="col-auto" *ngFor="let r of favoritesPreview().slice(0,3)">
-        <div class="card card-main small-card h-100">
-          <img [src]="r.strMealThumb" class="card-img-top" [alt]="r.strMeal">
-          <div class="card-body p-3 text-center">
-            <h6 class="card-title mb-2 text-truncate">{{ r.strMeal }}</h6>
-            <a (click)="goToRecipe(r.idMeal)" class="btn btn-outline-main btn-sm w-100">
-              Details
-            </a>
-          </div>
-        </div>
+        <app-recipe-card [recipe]="r" [compact]="true"></app-recipe-card>
       </div>
     </div>
   </section>
@@ -58,112 +40,33 @@ import { SearchFormComponent } from '../shared/search-form.component';
   <section *ngIf="recipes().length" class="recipes-section text-center">
     <div class="row row-cols-1 row-cols-md-3 g-4 justify-content-center">
       <div class="col" *ngFor="let r of recipes()">
-        <div class="card card-main h-100">
-          <img [src]="r.strMealThumb" class="card-img-top" [alt]="r.strMeal">
-          <div class="card-body">
-            <h5 class="card-title mb-3">{{ r.strMeal }}</h5>
-            <a (click)="goToRecipe(r.idMeal)" class="btn btn-outline-main btn-sm">
-              Details
-            </a>
-          </div>
-        </div>
+        <app-recipe-card [recipe]="r" [compact]="false"></app-recipe-card>
       </div>
     </div>
   </section>
 </div>
   `,
   styles: [`
-:host {
-  display: block;
-  background-color: #ffffff;
-  color: #222222;
-  font-family: 'Montserrat', sans-serif;
-}
-.home-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 1rem;
-  text-align: center;
-}
-// .navbar {
-//   display: flex;
-//   justify-content: space-between;
-//   align-items: center;
-//   width: fit-content;
-//   margin: 0 auto 2rem;
-//   gap: 2rem;
-// }
-// /* Media query: center nav items on mobile */
-// @media (max-width: 768px) {
-//   .navbar {
-//     flex-direction: column;
-//     justify-content: center;
-//     align-items: center;
-//     gap: 1rem;
-//   }
-// }
-// .hero {
-//   font-size: 2.5rem;
-//   color: #D64541;
-//   margin: 0;
-// }
-.btn-outline-main {
-  color: #D64541;
-  border-color: #D64541;
-  border-radius: 0.5rem;
-}
-.btn-outline-main:hover {
-  background-color: #D64541;
-  color: #ffffff;
-}
-// .search-form .input-group {
-//   max-width: 600px;
-//   margin: 0 auto;
-// }
-// .input-main {
-//   border: 2px solid #D64541;
-//   border-right: none;
-//   border-radius: 0.5rem 0 0 0.5rem;
-// }
-// .input-main:focus {
-//   box-shadow: none;
-//   border-color: #A2342F;
-// }
-// .btn-main {
-//   background-color: #D64541;
-//   border: none;
-//   border-radius: 0 0.5rem 0.5rem 0;
-//   color: #ffffff;
-// }
-// .btn-main:hover {
-//   background-color: #A2342F;
-// }
-.card-main {
-  border: none;
-  border-radius: 1rem;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.1);
-  transition: transform 0.3s;
-}
-.card-main:hover {
-  transform: translateY(-8px);
-}
-.small-card {
-  max-width: 14rem;
-}
-.card-img-top {
-  border-top-left-radius: 1rem;
-  border-top-right-radius: 1rem;
-  height: 200px;
-  object-fit: cover;
-}
-.section-title {
-  font-size: 1.75rem;
-  color: #4A90E2;
-  margin-bottom: 1rem;
-}
-.alert {
-  max-width: 400px;
-}
+  :host {
+    display: block;
+    background-color: #ffffff;
+    color: #222222;
+    font-family: 'Montserrat', sans-serif;
+  }
+  .home-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+    text-align: center;
+  }
+  .section-title {
+    font-size: 1.75rem;
+    color: #4A90E2;
+    margin-bottom: 1rem;
+  }
+  .alert {
+    max-width: 400px;
+  }
 `]
 })
 export class HomeComponent {

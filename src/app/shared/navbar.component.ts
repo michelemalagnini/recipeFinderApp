@@ -8,7 +8,7 @@ import { CommonModule } from '@angular/common';
   imports: [CommonModule, RouterModule],
   template: `
     <nav class="navbar mb-5">
-      <h1 class="hero">🍽️ Recipe Book</h1>
+      <h1 class="hero">🧑‍🍳Recipe Book</h1>
       <a routerLink="/favorites" class="btn btn-outline-main">❤️ Favorites</a>
     </nav>
   `,
