@@ -2,11 +2,12 @@ import { Component, inject, signal } from '@angular/core';
 import { FavoritesService } from '../core/favorites.service';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { RecipeCardComponent } from '../shared/recipe-card.component';
 
 @Component({
   selector: 'app-favorites',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, RecipeCardComponent],
   template: `
 <div class="favorites-container py-5">
   <!-- BACK BUTTON -->
@@ -29,18 +30,7 @@ import { RouterModule } from '@angular/router';
   <section *ngIf="favorites().length > 0" class="favorites-section">
     <div class="row row-cols-1 row-cols-md-3 g-4 justify-content-center">
       <div class="col" *ngFor="let r of favorites()">
-        <div class="card card-main h-100">
-          <img [src]="r.strMealThumb" class="card-img-top" [alt]="r.strMeal" />
-          <div class="card-body text-center">
-            <h5 class="card-title mb-3">{{ r.strMeal }}</h5>
-            <a [routerLink]="['/recipe', r.idMeal]" class="btn btn-outline-main btn-sm me-2">
-              Details
-            </a>
-            <button (click)="remove(r.idMeal)" class="btn btn-outline-danger btn-sm">
-              Remove
-            </button>
-          </div>
-        </div>
+        <app-recipe-card [recipe]="r" [compact]="false"></app-recipe-card>
       </div>
     </div>
   </section>
@@ -81,21 +71,6 @@ import { RouterModule } from '@angular/router';
 .btn-outline-danger:hover {
   background-color: #A2342F;
   color: #ffffff;
-}
-.card-main {
-  border: none;
-  border-radius: 1rem;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.1);
-  transition: transform 0.3s;
-}
-.card-main:hover {
-  transform: translateY(-8px);
-}
-.card-img-top {
-  border-top-left-radius: 1rem;
-  border-top-right-radius: 1rem;
-  height: 200px;
-  object-fit: cover;
 }
 @media (max-width: 768px) {
   .favorites-section .row {
