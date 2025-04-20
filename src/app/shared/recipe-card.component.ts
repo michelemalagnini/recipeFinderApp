@@ -1,6 +1,7 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { BaseRecipe } from '../core/recipe.model';
 
 @Component({
   selector: 'app-recipe-card',
@@ -8,14 +9,20 @@ import { RouterModule } from '@angular/router';
   imports: [CommonModule, RouterModule],
   template: `
     <div class="card card-main h-100">
-    <img *ngIf="!compact" [src]="recipe.strMealThumb" class="card-img-top" [alt]="recipe.strMeal">
-    <div class="card-body text-center">
-        <h6 *ngIf="!compact" class="card-title mb-2 text-truncate">{{ recipe.strMeal }}</h6>
-        <h5 *ngIf="compact" class="card-title mb-3">{{ recipe.strMeal }}</h5>
-        <a [routerLink]="['/recipe', recipe.idMeal]" class="btn btn-outline-main btn-sm w-100">
-        Details
+      <img *ngIf="!compact" [src]="recipe.strMealThumb" class="card-img-top" [alt]="recipe.strMeal">
+      <div class="card-body text-center">
+        <h6 *ngIf="compact" class="card-title mb-2 text-truncate">{{ recipe.strMeal }}</h6>
+        <h5 *ngIf="!compact" class="card-title mb-3">{{ recipe.strMeal }}</h5>
+        <a [routerLink]="['/recipe', recipe.idMeal]" class="btn btn-outline-main btn-sm me-2">
+          Details
         </a>
-    </div>
+
+        <button *ngIf="showRemoveButton"
+                (click)="onRemove()"
+                class="btn btn-outline-danger btn-sm">
+          Remove
+        </button>
+      </div>
     </div>
   `,
   styles: [`
@@ -43,12 +50,27 @@ import { RouterModule } from '@angular/router';
       background-color: #D64541;
       color: #ffffff;
     }
+    .btn-outline-danger {
+      color: #A2342F;
+      border: 2px solid #A2342F;
+      border-radius: 0.5rem;
+    }
+    .btn-outline-danger:hover {
+      background-color: #A2342F;
+      color: #ffffff;
+    }
     .small-card {
       max-width: 14rem;
     }
   `]
 })
 export class RecipeCardComponent {
-  @Input() recipe!: { strMeal: string; strMealThumb: string; idMeal: string };
+  @Input() recipe!: BaseRecipe;
   @Input() compact = false;
+  @Input() showRemoveButton = false;
+  @Output() remove = new EventEmitter<string>();
+
+  onRemove() {
+    this.remove.emit(this.recipe.idMeal);
+  }
 }

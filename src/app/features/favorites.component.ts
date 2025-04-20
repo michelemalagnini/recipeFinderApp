@@ -30,7 +30,12 @@ import { RecipeCardComponent } from '../shared/recipe-card.component';
   <section *ngIf="favorites().length > 0" class="favorites-section">
     <div class="row row-cols-1 row-cols-md-3 g-4 justify-content-center">
       <div class="col" *ngFor="let r of favorites()">
-        <app-recipe-card [recipe]="r" [compact]="false"></app-recipe-card>
+        <app-recipe-card
+          [recipe]="r"
+          [compact]="false"
+          [showRemoveButton]="true"
+          (remove)="remove($event)">
+        </app-recipe-card>
       </div>
     </div>
   </section>

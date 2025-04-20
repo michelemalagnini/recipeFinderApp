@@ -1,25 +1,35 @@
 import { Injectable, signal, computed } from '@angular/core';
+import { BaseRecipe } from './recipe.model';
+
 
 @Injectable({ providedIn: 'root' })
 export class FavoritesService {
-  
   private storageKey = 'favorite_recipes';
 
-  private favoritesSignal = signal<any[]>(this.loadFavorites());
+  // Signal state tipizzato
+  private favoritesSignal = signal<BaseRecipe[]>(this.loadFavorites());
 
+  // API pubblica reactive
   readonly favorites = computed(() => this.favoritesSignal());
+  readonly favoritesCount = computed(() => this.favoritesSignal().length);
 
-  private loadFavorites(): any[] {
-    const stored = localStorage.getItem(this.storageKey);
-    return stored ? JSON.parse(stored) : [];
+  private loadFavorites(): BaseRecipe[] {
+    try {
+      const stored = localStorage.getItem(this.storageKey);
+      return stored ? JSON.parse(stored) : [];
+    } catch (e) {
+      console.warn('Favorites parsing failed, clearing storage');
+      localStorage.removeItem(this.storageKey);
+      return [];
+    }
   }
 
-  private updateStorage(data: any[]) {
+  private updateStorage(data: BaseRecipe[]) {
     localStorage.setItem(this.storageKey, JSON.stringify(data));
     this.favoritesSignal.set(data);
   }
 
-  add(recipe: any) {
+  add(recipe: BaseRecipe) {
     if (!this.isFavorite(recipe.idMeal)) {
       const updated = [...this.favoritesSignal(), recipe];
       this.updateStorage(updated);
@@ -31,8 +41,13 @@ export class FavoritesService {
     this.updateStorage(updated);
   }
 
+  toggle(recipe: BaseRecipe) {
+    this.isFavorite(recipe.idMeal)
+      ? this.remove(recipe.idMeal)
+      : this.add(recipe);
+  }
+
   isFavorite(id: string): boolean {
     return this.favoritesSignal().some(r => r.idMeal === id);
   }
 }
-
