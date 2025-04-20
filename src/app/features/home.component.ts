@@ -4,18 +4,17 @@ import { FormsModule } from '@angular/forms';
 import { RecipeService } from '../core/recipe.service';
 import { RouterModule, Router } from '@angular/router';
 import { FavoritesService } from '../core/favorites.service';
+import { NavbarComponent } from '../shared/navbar.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, NavbarComponent],
   template: `
 <div class="home-container py-5">
   <!-- NAVBAR -->
-  <nav class="navbar mb-5">
-    <h1 class="hero">🍽️ Recipe Book</h1>
-    <a routerLink="/favorites" class="btn btn-outline-main">❤️ Favorites</a>
-  </nav>
+  <app-navbar></app-navbar>
+
 
   <!-- SEARCH FORM -->
   <form (submit)="search(); $event.preventDefault()" class="search-form mb-5 text-center">
