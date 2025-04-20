@@ -7,6 +7,7 @@ import { FavoritesService } from '../core/favorites.service';
 import { NavbarComponent } from '../shared/navbar.component';
 import { SearchFormComponent } from '../shared/search-form.component';
 import { RecipeCardComponent } from '../shared/recipe-card.component';
+import { Recipe, RecipeResponse } from '../core/recipe.model';
 
 @Component({
   selector: 'app-home',
@@ -72,7 +73,7 @@ import { RecipeCardComponent } from '../shared/recipe-card.component';
 export class HomeComponent {
   query = '';
   loading = signal(false);
-  recipes = signal<any[]>([]);
+  recipes = signal<Recipe[]>([]);
   error = signal<string | null>(null);
 
   private recipeService = inject(RecipeService);
@@ -92,7 +93,7 @@ export class HomeComponent {
     this.loading.set(true);
   
     this.recipeService.searchRecipes(query).subscribe({
-      next: (res) => {
+      next: (res: RecipeResponse) => {
         this.recipes.set(res.meals || []);
         if (!res.meals) this.error.set('No recipe found.');
         this.loading.set(false);
