@@ -5,11 +5,12 @@ import { RecipeService } from '../core/recipe.service';
 import { RouterModule, Router } from '@angular/router';
 import { FavoritesService } from '../core/favorites.service';
 import { NavbarComponent } from '../shared/navbar.component';
+import { SearchFormComponent } from '../shared/search-form.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, NavbarComponent],
+  imports: [CommonModule, FormsModule, RouterModule, NavbarComponent, SearchFormComponent],
   template: `
 <div class="home-container py-5">
   <!-- NAVBAR -->
@@ -17,7 +18,7 @@ import { NavbarComponent } from '../shared/navbar.component';
 
 
   <!-- SEARCH FORM -->
-  <form (submit)="search(); $event.preventDefault()" class="search-form mb-5 text-center">
+  <!-- <form (submit)="search(); $event.preventDefault()" class="search-form mb-5 text-center">
     <div class="input-group justify-content-center">
       <input
         [(ngModel)]="query"
@@ -27,7 +28,9 @@ import { NavbarComponent } from '../shared/navbar.component';
       >
       <button class="btn btn-main" type="submit">Search</button>
     </div>
-  </form>
+  </form> -->
+  <app-search-form (searchSubmit)="search($event)"></app-search-form>
+
 
   <!-- ERROR / LOADING -->
   <div *ngIf="error()" class="alert alert-danger mx-auto w-50">{{ error() }}</div>
@@ -82,28 +85,28 @@ import { NavbarComponent } from '../shared/navbar.component';
   padding: 0 1rem;
   text-align: center;
 }
-.navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: fit-content;
-  margin: 0 auto 2rem;
-  gap: 2rem;
-}
-/* Media query: center nav items on mobile */
-@media (max-width: 768px) {
-  .navbar {
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 1rem;
-  }
-}
-.hero {
-  font-size: 2.5rem;
-  color: #D64541;
-  margin: 0;
-}
+// .navbar {
+//   display: flex;
+//   justify-content: space-between;
+//   align-items: center;
+//   width: fit-content;
+//   margin: 0 auto 2rem;
+//   gap: 2rem;
+// }
+// /* Media query: center nav items on mobile */
+// @media (max-width: 768px) {
+//   .navbar {
+//     flex-direction: column;
+//     justify-content: center;
+//     align-items: center;
+//     gap: 1rem;
+//   }
+// }
+// .hero {
+//   font-size: 2.5rem;
+//   color: #D64541;
+//   margin: 0;
+// }
 .btn-outline-main {
   color: #D64541;
   border-color: #D64541;
@@ -113,28 +116,28 @@ import { NavbarComponent } from '../shared/navbar.component';
   background-color: #D64541;
   color: #ffffff;
 }
-.search-form .input-group {
-  max-width: 600px;
-  margin: 0 auto;
-}
-.input-main {
-  border: 2px solid #D64541;
-  border-right: none;
-  border-radius: 0.5rem 0 0 0.5rem;
-}
-.input-main:focus {
-  box-shadow: none;
-  border-color: #A2342F;
-}
-.btn-main {
-  background-color: #D64541;
-  border: none;
-  border-radius: 0 0.5rem 0.5rem 0;
-  color: #ffffff;
-}
-.btn-main:hover {
-  background-color: #A2342F;
-}
+// .search-form .input-group {
+//   max-width: 600px;
+//   margin: 0 auto;
+// }
+// .input-main {
+//   border: 2px solid #D64541;
+//   border-right: none;
+//   border-radius: 0.5rem 0 0 0.5rem;
+// }
+// .input-main:focus {
+//   box-shadow: none;
+//   border-color: #A2342F;
+// }
+// .btn-main {
+//   background-color: #D64541;
+//   border: none;
+//   border-radius: 0 0.5rem 0.5rem 0;
+//   color: #ffffff;
+// }
+// .btn-main:hover {
+//   background-color: #A2342F;
+// }
 .card-main {
   border: none;
   border-radius: 1rem;
@@ -175,17 +178,17 @@ export class HomeComponent {
 
   favoritesPreview = this.favoritesService.favorites;
 
-  search() {
-    if (!this.query.trim()) {
+  search(query: string) {
+    if (!query.trim()) {
       this.error.set('Enter an ingredient or keyword.');
       this.recipes.set([]);
       return;
     }
-
+  
     this.error.set(null);
     this.loading.set(true);
-
-    this.recipeService.searchRecipes(this.query.trim()).subscribe({
+  
+    this.recipeService.searchRecipes(query).subscribe({
       next: (res) => {
         this.recipes.set(res.meals || []);
         if (!res.meals) this.error.set('No recipe found.');
