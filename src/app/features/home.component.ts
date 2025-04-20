@@ -1,38 +1,58 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RecipeService } from '../core/recipe.service';
 import { RouterModule, Router } from '@angular/router';
+
+import { RecipeService } from '../core/recipe.service';
 import { FavoritesService } from '../core/favorites.service';
+
 import { NavbarComponent } from '../shared/navbar.component';
 import { SearchFormComponent } from '../shared/search-form.component';
 import { RecipeCardComponent } from '../shared/recipe-card.component';
+import { SkeletonCardComponent } from '../shared/skeleton-card.component';
+
 import { Recipe, RecipeResponse } from '../core/recipe.model';
+
+const STORAGE_KEY = 'last_search';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, NavbarComponent, SearchFormComponent, RecipeCardComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterModule,
+    NavbarComponent,
+    SearchFormComponent,
+    RecipeCardComponent,
+    SkeletonCardComponent
+  ],
   template: `
 <div class="home-container py-5">
   <!-- NAVBAR -->
   <app-navbar></app-navbar>
 
-
   <!-- SEARCH FORM -->
   <app-search-form (searchSubmit)="search($event)"></app-search-form>
 
+  <!-- SEARCH CONTEXT MESSAGE -->
+  <p class="text-muted text-center mb-3" *ngIf="recipes().length && query()">
+    <ng-container *ngIf="isDefaultSearch(); else customSearch">
+      Showing results for <strong>“pork”</strong> to get you started!
+    </ng-container>
+    <ng-template #customSearch>
+      🔎 Showing results for <strong>“{{ query() }}”</strong>
+    </ng-template>
+  </p>
 
-  <!-- ERROR / LOADING -->
+  <!-- ERROR -->
   <div *ngIf="error()" class="alert alert-danger mx-auto w-50">{{ error() }}</div>
-  <div *ngIf="loading()" class="text-muted text-center">Loading...</div>
 
-  <!-- FAVORITES PREVIEW -->
-  <section *ngIf="favoritesPreview().length" class="favorites-section mb-5 text-center">
-    <h2 class="section-title">⭐ Your first 3 favorites</h2>
-    <div class="row g-4 justify-content-center">
-      <div class="col-auto" *ngFor="let r of favoritesPreview().slice(0,3)">
-        <app-recipe-card [recipe]="r" [compact]="true"></app-recipe-card>
+  <!-- LOADING SKELETON -->
+  <section *ngIf="loading()" class="recipes-section text-center">
+    <div class="row row-cols-1 row-cols-md-3 g-4 justify-content-center">
+      <div class="col" *ngFor="let i of [1,2,3,4,5,6]">
+        <app-skeleton-card></app-skeleton-card>
       </div>
     </div>
   </section>
@@ -71,10 +91,11 @@ import { Recipe, RecipeResponse } from '../core/recipe.model';
 `]
 })
 export class HomeComponent {
-  query = '';
+  query = signal('');
   loading = signal(false);
   recipes = signal<Recipe[]>([]);
   error = signal<string | null>(null);
+  isDefaultSearch = signal(false);
 
   private recipeService = inject(RecipeService);
   private router = inject(Router);
@@ -82,20 +103,47 @@ export class HomeComponent {
 
   favoritesPreview = this.favoritesService.favorites;
 
+  ngOnInit(): void {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      const { query, results } = JSON.parse(stored);
+      this.query.set(query);
+      this.recipes.set(results);
+      this.isDefaultSearch.set(false);
+    } else {
+      this.search('pork');
+      this.isDefaultSearch.set(true);
+    }
+  }
+
   search(query: string) {
-    if (!query.trim()) {
+    const trimmed = query.trim();
+    if (!trimmed) {
       this.error.set('Enter an ingredient or keyword.');
       this.recipes.set([]);
       return;
     }
   
+    this.query.set(trimmed);
     this.error.set(null);
     this.loading.set(true);
+    this.isDefaultSearch.set(false);
   
-    this.recipeService.searchRecipes(query).subscribe({
+    this.recipeService.searchRecipes(trimmed).subscribe({
       next: (res: RecipeResponse) => {
-        this.recipes.set(res.meals || []);
-        if (!res.meals) this.error.set('No recipe found.');
+        const result = res.meals || [];
+        this.recipes.set(result);
+  
+        if (!res.meals) {
+          this.error.set('No recipe found.');
+        } else {
+          // ✅ Salva solo se ci sono risultati
+          localStorage.setItem(STORAGE_KEY, JSON.stringify({
+            query: trimmed,
+            results: result
+          }));
+        }
+  
         this.loading.set(false);
       },
       error: () => {
@@ -104,8 +152,13 @@ export class HomeComponent {
       }
     });
   }
+  
 
   goToRecipe(idMeal: string) {
     this.router.navigate(['/recipe', idMeal]);
+  }
+
+  showDefaultMessage(): boolean {
+    return this.isDefaultSearch() && !this.error();
   }
 }

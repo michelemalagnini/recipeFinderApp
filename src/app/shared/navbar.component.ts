@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { FavoritesService } from '../core/favorites.service';
 
 @Component({
   selector: 'app-navbar',
@@ -10,6 +11,7 @@ import { CommonModule } from '@angular/common';
     <nav class="navbar mb-5">
       <h1 class="hero">🧑‍🍳Recipe Book</h1>
       <a routerLink="/favorites" class="btn btn-outline-main">❤️ Favorites</a>
+      <span *ngIf="favoritesCount() > 0"  class="favorites-badge">{{ favoritesCount() }}</span>
     </nav>
   `,
   styles: [`
@@ -43,6 +45,28 @@ import { CommonModule } from '@angular/common';
       background-color: #D64541;
       color: #ffffff;
     }
+    .position-relative {
+      position: relative;
+    }
+    .favorites-badge {
+      position: absolute;
+      top: -0.5rem;
+      right: -0.75rem;
+      background-color: #D64541;
+      color: white;
+      border-radius: 50%;
+      font-size: 0.75rem;
+      width: 1.5rem;
+      height: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      box-shadow: 0 0 0 2px white;
+    }
   `]
 })
-export class NavbarComponent {}
+export class NavbarComponent {
+  private favoritesService = inject(FavoritesService);
+  favoritesCount = this.favoritesService.favoritesCount;
+}

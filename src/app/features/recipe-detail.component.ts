@@ -1,82 +1,89 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { RecipeService } from '../core/recipe.service';
+import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router } from '@angular/router';
+import { RecipeService } from '../core/recipe.service';
 import { FavoritesService } from '../core/favorites.service';
+import { SkeletonRecipeDetailComponent } from '../shared/skeleton-recipe-detail.component';
+import { Recipe, RecipeResponse } from '../core/recipe.model';
 
 @Component({
   selector: 'app-recipe-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, SkeletonRecipeDetailComponent],
   template: `
-<div class="detail-container py-5" *ngIf="recipe(); else errorTpl">
-  <!-- BACK BUTTON -->
-  <div class="mb-4 text-center text-md-start">
-    <a routerLink="/" class="btn btn-outline-main">
-      ← Back to search
-    </a>
-  </div>
+<!-- LOADING SKELETON -->
+<ng-container *ngIf="loading(); else contentTpl">
+  <app-skeleton-recipe-detail></app-skeleton-recipe-detail>
+</ng-container>
 
-  <!-- IMAGE + INFO -->
-  <div class="row align-items-start mb-5">
-    <div class="col-12 col-md-4 mb-4 mb-md-0 text-center">
-      <img
-        [src]="recipe().strMealThumb"
-        [alt]="recipe().strMeal"
-        class="img-fluid detail-img"
-      />
+<ng-template #contentTpl>
+  <!-- MAIN CONTENT -->
+  <div class="detail-container py-5" *ngIf="recipe(); else errorTpl">
+    <!-- BACK BUTTON -->
+    <div class="mb-4 text-center text-md-start">
+      <a routerLink="/" class="btn btn-outline-main">← Back to search</a>
     </div>
-    <div class="col-12 col-md-8">
-      <h2 class="detail-title mb-3">{{ recipe().strMeal }}</h2>
 
-      <div class="info-tags mb-4">
-        <span class="tag"><strong>Category:</strong> {{ recipe().strCategory }}</span>
-        <span class="tag"><strong>Area:</strong> {{ recipe().strArea }}</span>
+    <!-- IMAGE + INFO -->
+    <div class="row align-items-start mb-5">
+      <div class="col-12 col-md-4 mb-4 mb-md-0 text-center">
+        <img
+          [src]="recipe()?.strMealThumb"
+          [alt]="recipe()?.strMeal"
+          class="img-fluid detail-img"
+        />
       </div>
+      <div class="col-12 col-md-8">
+        <h2 class="detail-title mb-3">{{ recipe()?.strMeal }}</h2>
 
-      <button
-        class="btn btn-main me-3 mb-3"
-        (click)="toggleFavorite()"
-      >
-        <ng-container *ngIf="isFav(); else notFav">
-          ❤️ Remove from favorites
-        </ng-container>
-        <ng-template #notFav>🤍 Add to favorites</ng-template>
-      </button>
+        <div class="info-tags mb-4">
+          <span class="tag"><strong>Category:</strong> {{ recipe()?.strCategory }}</span>
+          <span class="tag"><strong>Area:</strong> {{ recipe()?.strArea }}</span>
+        </div>
 
-      <a
-        *ngIf="recipe().strYoutube"
-        [href]="recipe().strYoutube"
-        target="_blank"
-        class="btn btn-outline-main mb-3"
-      >
-        ▶ Watch on YouTube
-      </a>
+        <button class="btn btn-main me-3 mb-3" (click)="toggleFavorite()">
+          <ng-container *ngIf="isFav(); else notFav">
+            ❤️ Remove from favorites
+          </ng-container>
+          <ng-template #notFav>🤍 Add to favorites</ng-template>
+        </button>
+
+        <a
+          *ngIf="recipe()?.strYoutube"
+          [href]="recipe()?.strYoutube"
+          target="_blank"
+          class="btn btn-outline-main mb-3"
+        >
+          ▶ Watch on YouTube
+        </a>
+      </div>
     </div>
+
+    <!-- INGREDIENTS -->
+    <section class="mb-5">
+      <h4 class="section-title">Ingredients</h4>
+      <ul class="list-unstyled ingredients-list">
+        <li *ngFor="let ing of getIngredients()">{{ ing }}</li>
+      </ul>
+    </section>
+
+    <!-- INSTRUCTIONS -->
+    <section>
+      <h4 class="section-title">Instructions</h4>
+      <p class="instructions" style="white-space: pre-line">
+        {{ recipe()?.strInstructions }}
+      </p>
+    </section>
   </div>
 
-  <!-- INGREDIENTS -->
-  <section class="mb-5">
-    <h4 class="section-title">Ingredients</h4>
-    <ul class="list-unstyled ingredients-list">
-      <li *ngFor="let ing of getIngredients()">{{ ing }}</li>
-    </ul>
-  </section>
-
-  <!-- INSTRUCTIONS -->
-  <section>
-    <h4 class="section-title">Instructions</h4>
-    <p class="instructions" style="white-space: pre-line">{{ recipe().strInstructions }}</p>
-  </section>
-</div>
-
-<ng-template #errorTpl>
-  <div class="alert alert-danger mt-4 text-center">
-    {{ error() }}
-    <br />
-    <a routerLink="/" class="btn btn-outline-main mt-3">← Back to search</a>
-  </div>
+  <!-- ERROR STATE -->
+  <ng-template #errorTpl>
+    <div class="alert alert-danger mt-4 text-center">
+      {{ error() }}
+      <br />
+      <a routerLink="/" class="btn btn-outline-main mt-3">← Back to search</a>
+    </div>
+  </ng-template>
 </ng-template>
   `,
   styles: [`
@@ -154,21 +161,22 @@ import { FavoritesService } from '../core/favorites.service';
 `]
 })
 export class RecipeDetailComponent implements OnInit {
-  recipe = signal<any | null>(null);
+  recipe = signal<Recipe | null>(null);
   error = signal<string | null>(null);
   isFav = signal(false);
+  loading = signal(true);
 
   private recipeService = inject(RecipeService);
   private route = inject(ActivatedRoute);
   private favoritesService = inject(FavoritesService);
-
-  constructor(private router: Router) {}
+  private router = inject(Router);
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
+      this.loading.set(true);
       this.recipeService.getRecipeById(id).subscribe({
-        next: (res) => {
+        next: (res: RecipeResponse) => {
           const found = res.meals?.[0];
           if (found) {
             this.recipe.set(found);
@@ -176,11 +184,16 @@ export class RecipeDetailComponent implements OnInit {
           } else {
             this.error.set('Recipe not found.');
           }
+          this.loading.set(false);
         },
-        error: () => this.error.set('Error retrieving data.')
+        error: () => {
+          this.error.set('Error retrieving data.');
+          this.loading.set(false);
+        }
       });
     } else {
       this.error.set('Invalid recipe ID.');
+      this.loading.set(false);
     }
   }
 

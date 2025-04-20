@@ -3,11 +3,12 @@ import { FavoritesService } from '../core/favorites.service';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { RecipeCardComponent } from '../shared/recipe-card.component';
+import { SkeletonCardComponent } from '../shared/skeleton-card.component';
 
 @Component({
   selector: 'app-favorites',
   standalone: true,
-  imports: [CommonModule, RouterModule, RecipeCardComponent],
+  imports: [CommonModule, RouterModule, RecipeCardComponent, SkeletonCardComponent],
   template: `
 <div class="favorites-container py-5">
   <!-- BACK BUTTON -->
@@ -20,14 +21,23 @@ import { RecipeCardComponent } from '../shared/recipe-card.component';
   <!-- PAGE TITLE -->
   <h2 class="page-title mb-4">❤️ My Favorites</h2>
 
+ <!-- LOADING STATE -->
+  <section *ngIf="loading()" class="favorites-section">
+    <div class="row row-cols-1 row-cols-md-3 g-4 justify-content-center">
+      <div class="col" *ngFor="let i of [1,2,3,4,5,6]">
+        <app-skeleton-card></app-skeleton-card>
+      </div>
+    </div>
+  </section>
+
   <!-- EMPTY STATE -->
-  <div *ngIf="favorites().length === 0" class="alert alert-info mx-auto w-50 text-center">
+  <div *ngIf="!loading() && favorites().length === 0" class="alert alert-info mx-auto w-50 text-center">
     No saved recipes.
     <a routerLink="/" class="btn btn-sm btn-outline-main ms-2">Search for a recipe</a>
   </div>
 
   <!-- FAVORITES GRID -->
-  <section *ngIf="favorites().length > 0" class="favorites-section">
+  <section *ngIf="!loading() && favorites().length > 0" class="favorites-section">
     <div class="row row-cols-1 row-cols-md-3 g-4 justify-content-center">
       <div class="col" *ngFor="let r of favorites()">
         <app-recipe-card
@@ -39,6 +49,7 @@ import { RecipeCardComponent } from '../shared/recipe-card.component';
       </div>
     </div>
   </section>
+
 </div>
   `,
   styles: [`
@@ -87,6 +98,12 @@ import { RecipeCardComponent } from '../shared/recipe-card.component';
 export class FavoritesComponent {
   private favoritesService = inject(FavoritesService);
   favorites = this.favoritesService.favorites;
+  loading = signal(true);
+
+  constructor() {
+    setTimeout(() => this.loading.set(false), 800);
+  }
+
 
   remove(id: string) {
     this.favoritesService.remove(id);
