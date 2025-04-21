@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
@@ -12,6 +12,9 @@ import { RecipeCardComponent } from '../shared/recipe-card.component';
 import { SkeletonCardComponent } from '../shared/skeleton-card.component';
 
 import { Recipe, RecipeResponse } from '../core/recipe.model';
+
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+
 
 const STORAGE_KEY = 'last_search';
 
@@ -100,6 +103,7 @@ export class HomeComponent {
   private recipeService = inject(RecipeService);
   private router = inject(Router);
   private favoritesService = inject(FavoritesService);
+  private destroyRef = inject(DestroyRef);
 
   favoritesPreview = this.favoritesService.favorites;
 
@@ -130,7 +134,9 @@ export class HomeComponent {
     this.error.set(null);
     this.loading.set(true);
     this.isDefaultSearch.set(false);
-    this.recipeService.searchRecipes(trimmed).subscribe({
+    this.recipeService.searchRecipes(trimmed).pipe(
+      takeUntilDestroyed(this.destroyRef) 
+    ).subscribe({
       next: (res: RecipeResponse) => {
         const result = res.meals || [];
         this.recipes.set(result);

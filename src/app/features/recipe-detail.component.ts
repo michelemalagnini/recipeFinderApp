@@ -1,10 +1,14 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, DestroyRef } from '@angular/core';
 import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { RecipeService } from '../core/recipe.service';
 import { FavoritesService } from '../core/favorites.service';
 import { SkeletonRecipeDetailComponent } from '../shared/skeleton-recipe-detail.component';
 import { Recipe, RecipeResponse } from '../core/recipe.model';
+import { FlagService } from '../core/coreFlag.service';
+import { switchMap, throwError } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+
 
 @Component({
   selector: 'app-recipe-detail',
@@ -38,7 +42,14 @@ import { Recipe, RecipeResponse } from '../core/recipe.model';
 
         <div class="info-tags mb-4">
           <span class="tag"><strong>Category:</strong> {{ recipe()?.strCategory }}</span>
-          <span class="tag"><strong>Area:</strong> {{ recipe()?.strArea }}</span>
+          <span class="tag"><strong>Area:</strong> {{ recipe()?.strArea }}
+            <img
+              *ngIf="flagUrl()"
+              [src]="flagUrl()"
+              [alt]="recipe()?.strArea + ' flag'"
+              class="flag-icon ms-2"
+            />
+          </span>
         </div>
 
         <button class="btn btn-main me-3 mb-3" (click)="toggleFavorite()">
@@ -158,36 +169,53 @@ import { Recipe, RecipeResponse } from '../core/recipe.model';
     text-align: center;
   }
 }
+.flag-icon {
+  width: 24px;
+  height: auto;
+  vertical-align: middle;
+  border-radius: 0.2rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
 `]
 })
 export class RecipeDetailComponent implements OnInit {
   recipe = signal<Recipe | null>(null);
   error = signal<string | null>(null);
   isFav = signal(false);
+  flagUrl = signal<string>('');
   loading = signal(true);
 
   private recipeService = inject(RecipeService);
   private route = inject(ActivatedRoute);
   private favoritesService = inject(FavoritesService);
-  private router = inject(Router);
+  private flagService = inject(FlagService);
+  private destroyRef = inject(DestroyRef);
+
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.loading.set(true);
-      this.recipeService.getRecipeById(id).subscribe({
-        next: (res: RecipeResponse) => {
+      this.recipeService.getRecipeById(id).pipe(
+        switchMap((res: RecipeResponse) => {
           const found = res.meals?.[0];
           if (found) {
             this.recipe.set(found);
             this.isFav.set(this.favoritesService.isFavorite(found.idMeal));
+            // Chain the flag API call using switchMap to avoid nested subscriptions
+            return this.flagService.getFlagByArea(found.strArea ?? '');
           } else {
-            this.error.set('Recipe not found.');
+            return throwError(() => new Error('Recipe not found.'));
           }
+        }),
+        takeUntilDestroyed(this.destroyRef)
+      ).subscribe({
+        next: (url: string) => {
+          this.flagUrl.set(url);
           this.loading.set(false);
         },
-        error: () => {
-          this.error.set('Error retrieving data.');
+        error: (err) => {
+          this.error.set(err.message || 'Error retrieving data.');
           this.loading.set(false);
         }
       });
