@@ -33,6 +33,13 @@
     background-color: #A2342F;
     color: #ffffff;
   }
+  .modal-backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+  
+  .modal {
+    display: block; // forzare il display quando isModalOpen=true
+  }
   @media (max-width: 768px) {
     .favorites-section .row {
       justify-content: center;

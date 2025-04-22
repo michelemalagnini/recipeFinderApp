@@ -40,3 +40,27 @@ This project was developed as part of a **Frontend Technical Assessment**.
 ```bash
 git clone https://github.com/your-username/recipe-finder.git
 cd recipe-finder
+### 2. System Requirements
+
+Ensure you have the following installed:
+- Node.js 
+- Angular CLI or use NPX before the angular cli command
+
+### 3. Install Dependencies
+
+```bash
+npm install
+```
+
+### 4. Run the Application Locally
+
+```bash
+ng serve --open
+```
+
+The first time, this command builds the application and opens your browser at http://localhost:4200.
+
+## 🌐 Live Demo
+
+The application has been deployed and is available for public viewing. Check it out at:
+(recipe-finder-n1cxl205v-michelemalagninis-projects.vercel.app)

@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { FavoritesService } from '../../core/services/favorites.service';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
@@ -25,13 +25,32 @@ export class FavoritesComponent {
   // Array of skeleton items used for loading placeholders.
   skeletonItems = [1, 2, 3, 4, 5, 6];
 
+  // Per la modale di conferma:
+  // selectedId tiene traccia di quale recipe stiamo per cancellare
+  selectedId = signal<string | null>(null);
+  isModalOpen = computed(() => this.selectedId() !== null);
+
   constructor() {
     // Simulate a delay (800ms) to show loading skeleton, then disable loading.
     setTimeout(() => this.loading.set(false), 800);
   }
 
-  // Method to remove a recipe from favorites by its id.
-  remove(id: string) {
-    this.favoritesService.remove(id);
+  // Click on the "remove" button in the card
+   onRemoveClick(id: string) {
+    this.selectedId.set(id);
+  }
+
+  // Confirm modal
+  confirmRemove() {
+    const id = this.selectedId();
+    if (id) {
+      this.favoritesService.remove(id);
+    }
+    this.selectedId.set(null);
+  }
+
+  // Cancel in the modal
+  cancelRemove() {
+    this.selectedId.set(null);
   }
 }
