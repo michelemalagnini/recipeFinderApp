@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient }    from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
@@ -34,7 +34,7 @@ export class FlagService {
         Vietnamese: 'Vietnam',
       };
 
-  constructor(private http: HttpClient) {}
+  private http = inject(HttpClient);
 
   getFlagByArea(area: string): Observable<string> {
     const country = this.areaToCountry[area] ?? area;
@@ -42,7 +42,6 @@ export class FlagService {
       .get<Country[]>(`https://restcountries.com/v3.1/name/${country}?fields=flags`)
       .pipe(
         map(countries => countries[0]?.flags?.png || ''),
-        catchError(() => of('assets/default-flag.png'))
       );
   }
 }
