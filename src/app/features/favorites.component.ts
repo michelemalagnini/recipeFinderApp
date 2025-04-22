@@ -24,7 +24,7 @@ import { SkeletonCardComponent } from '../shared/skeleton-card.component';
  <!-- LOADING STATE -->
   <section *ngIf="loading()" class="favorites-section">
     <div class="row row-cols-1 row-cols-md-3 g-4 justify-content-center">
-      <div class="col" *ngFor="let i of [1,2,3,4,5,6]">
+      <div class="col" *ngFor="let i of skeletonItems">
         <app-skeleton-card></app-skeleton-card>
       </div>
     </div>
@@ -99,6 +99,7 @@ export class FavoritesComponent {
   private favoritesService = inject(FavoritesService);
   favorites = this.favoritesService.favorites;
   loading = signal(true);
+  skeletonItems = [1,2,3,4,5,6]
 
   constructor() {
     setTimeout(() => this.loading.set(false), 800);

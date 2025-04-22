@@ -54,7 +54,7 @@ const STORAGE_KEY = 'last_search';
   <!-- LOADING SKELETON -->
   <section *ngIf="loading()" class="recipes-section text-center">
     <div class="row row-cols-1 row-cols-md-3 g-4 justify-content-center">
-      <div class="col" *ngFor="let i of [1,2,3,4,5,6]">
+      <div class="col" *ngFor="let i of skeletonItems">
         <app-skeleton-card></app-skeleton-card>
       </div>
     </div>
@@ -99,6 +99,7 @@ export class HomeComponent {
   recipes = signal<Recipe[]>([]);
   error = signal<string | null>(null);
   isDefaultSearch = signal(false);
+  skeletonItems = [1,2,3,4,5,6]
 
   private recipeService = inject(RecipeService);
   private router = inject(Router);
