@@ -1,0 +1,42 @@
+<div class="favorites-container py-5">
+    
+    <!-- BACK BUTTON -->
+    <div class="text-center text-md-start mb-4">
+      <a routerLink="/" class="btn btn-outline-main">
+        ← Back to search
+      </a>
+    </div>
+  
+    <!-- PAGE TITLE -->
+    <h2 class="page-title mb-4">❤️ My Favorites</h2>
+  
+   <!-- LOADING STATE -->
+    <section *ngIf="loading()" class="favorites-section">
+      <div class="row row-cols-1 row-cols-md-3 g-4 justify-content-center">
+        <div class="col" *ngFor="let i of skeletonItems">
+          <app-skeleton-card></app-skeleton-card>
+        </div>
+      </div>
+    </section>
+  
+    <!-- EMPTY STATE -->
+    <div *ngIf="!loading() && favorites().length === 0" class="alert alert-info mx-auto w-50 text-center">
+      No saved recipes.
+      <a routerLink="/" class="btn btn-sm btn-outline-main ms-2">Search for a recipe</a>
+    </div>
+  
+    <!-- FAVORITES GRID -->
+    <section *ngIf="!loading() && favorites().length > 0" class="favorites-section">
+      <div class="row row-cols-1 row-cols-md-3 g-4 justify-content-center">
+        <div class="col" *ngFor="let r of favorites()">
+          <app-recipe-card
+            [recipe]="r"
+            [compact]="false"
+            [showRemoveButton]="true"
+            (remove)="remove($event)">
+          </app-recipe-card>
+        </div>
+      </div>
+    </section>
+  
+  </div>

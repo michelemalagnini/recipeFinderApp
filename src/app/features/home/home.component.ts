@@ -3,15 +3,15 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
 
-import { RecipeService } from '../core/services/recipe.service';
-import { FavoritesService } from '../core/services/favorites.service';
+import { RecipeService } from '../../core/services/recipe.service';
+import { FavoritesService } from '../../core/services/favorites.service';
 
-import { NavbarComponent } from '../shared/navbar.component';
-import { SearchFormComponent } from '../shared/search-form.component';
-import { RecipeCardComponent } from '../shared/recipe-card.component';
-import { SkeletonCardComponent } from '../shared/skeleton-card.component';
+import { NavbarComponent } from '../../shared/navbar.component';
+import { SearchFormComponent } from '../../shared/search-form.component';
+import { RecipeCardComponent } from '../../shared/recipe-card.component';
+import { SkeletonCardComponent } from '../../shared/skeleton-card.component';
 
-import { Recipe, RecipeResponse } from '../core/models/recipe.model';
+import { Recipe, RecipeResponse } from '../../core/models/recipe.model';
 
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
@@ -30,68 +30,8 @@ const STORAGE_KEY = 'last_search';
     RecipeCardComponent,
     SkeletonCardComponent
   ],
-  template: `
-<div class="home-container py-5">
-  <!-- NAVBAR -->
-  <app-navbar></app-navbar>
-
-  <!-- SEARCH FORM -->
-  <app-search-form (searchSubmit)="search($event)"></app-search-form>
-
-  <!-- SEARCH CONTEXT MESSAGE -->
-  <p class="text-muted text-center mb-3" *ngIf="recipes().length && query()">
-    <ng-container *ngIf="isDefaultSearch(); else customSearch">
-      Showing results for <strong>“pork”</strong> to get you started!
-    </ng-container>
-    <ng-template #customSearch>
-      🔎 Showing results for <strong>“{{ query() }}”</strong>
-    </ng-template>
-  </p>
-
-  <!-- ERROR -->
-  <div *ngIf="error()" class="alert alert-danger mx-auto w-50">{{ error() }}</div>
-
-  <!-- LOADING SKELETON -->
-  <section *ngIf="loading()" class="recipes-section text-center">
-    <div class="row row-cols-1 row-cols-md-3 g-4 justify-content-center">
-      <div class="col" *ngFor="let i of skeletonItems">
-        <app-skeleton-card></app-skeleton-card>
-      </div>
-    </div>
-  </section>
-
-  <!-- RECIPES GRID -->
-  <section *ngIf="recipes().length" class="recipes-section text-center">
-    <div class="row row-cols-1 row-cols-md-3 g-4 justify-content-center">
-      <div class="col" *ngFor="let r of recipes()">
-        <app-recipe-card [recipe]="r" [compact]="false"></app-recipe-card>
-      </div>
-    </div>
-  </section>
-</div>
-  `,
-  styles: [`
-  :host {
-    display: block;
-    background-color: #ffffff;
-    color: #222222;
-    font-family: 'Montserrat', sans-serif;
-  }
-  .home-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 1rem;
-    text-align: center;
-  }
-  .section-title {
-    font-size: 1.75rem;
-    color: #4A90E2;
-    margin-bottom: 1rem;
-  }
-  .alert {
-    max-width: 400px;
-  }
-`]
+  templateUrl: './home.component.html',
+  styleUrls: ['./home.component.scss'],
 })
 export class HomeComponent {
   query = signal('');

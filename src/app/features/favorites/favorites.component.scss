@@ -1,0 +1,40 @@
+:host {
+    display: block;
+    background-color: #ffffff;
+    color: #222222;
+    font-family: 'Montserrat', sans-serif;
+  }
+  .favorites-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+    text-align: center;
+  }
+  .page-title {
+    font-size: 2rem;
+    color: #D64541;
+    margin: 0;
+  }
+  .btn-outline-main {
+    color: #D64541;
+    border: 2px solid #D64541;
+    border-radius: 0.5rem;
+  }
+  .btn-outline-main:hover {
+    background-color: #D64541;
+    color: #ffffff;
+  }
+  .btn-outline-danger {
+    color: #A2342F;
+    border: 2px solid #A2342F;
+    border-radius: 0.5rem;
+  }
+  .btn-outline-danger:hover {
+    background-color: #A2342F;
+    color: #ffffff;
+  }
+  @media (max-width: 768px) {
+    .favorites-section .row {
+      justify-content: center;
+    }
+  }

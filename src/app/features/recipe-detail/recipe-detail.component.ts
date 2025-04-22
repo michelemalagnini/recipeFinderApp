@@ -1,11 +1,11 @@
 import { Component, inject, OnInit, signal, DestroyRef } from '@angular/core';
 import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { RecipeService } from '../core/services/recipe.service';
-import { FavoritesService } from '../core/services/favorites.service';
-import { SkeletonRecipeDetailComponent } from '../shared/skeleton-recipe-detail.component';
-import { Recipe, RecipeResponse } from '../core/models/recipe.model';
-import { FlagService } from '../core/services/coreFlag.service';
+import { RecipeService } from '../../core/services/recipe.service';
+import { FavoritesService } from '../../core/services/favorites.service';
+import { SkeletonRecipeDetailComponent } from '../../shared/skeleton-recipe-detail.component';
+import { Recipe, RecipeResponse } from '../../core/models/recipe.model';
+import { FlagService } from '../../core/services/coreFlag.service';
 import { switchMap, throwError } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 

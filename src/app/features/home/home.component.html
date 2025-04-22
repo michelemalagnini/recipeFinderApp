@@ -1,0 +1,38 @@
+<div class="home-container py-5">
+    <!-- NAVBAR -->
+    <app-navbar></app-navbar>
+  
+    <!-- SEARCH FORM -->
+    <app-search-form (searchSubmit)="search($event)"></app-search-form>
+  
+    <!-- SEARCH CONTEXT MESSAGE -->
+    <p class="text-muted text-center mb-3" *ngIf="recipes().length && query()">
+      <ng-container *ngIf="isDefaultSearch(); else customSearch">
+        Showing results for <strong>“pork”</strong> to get you started!
+      </ng-container>
+      <ng-template #customSearch>
+        🔎 Showing results for <strong>“{{ query() }}”</strong>
+      </ng-template>
+    </p>
+  
+    <!-- ERROR -->
+    <div *ngIf="error()" class="alert alert-danger mx-auto w-50">{{ error() }}</div>
+  
+    <!-- LOADING SKELETON -->
+    <section *ngIf="loading()" class="recipes-section text-center">
+      <div class="row row-cols-1 row-cols-md-3 g-4 justify-content-center">
+        <div class="col" *ngFor="let i of skeletonItems">
+          <app-skeleton-card></app-skeleton-card>
+        </div>
+      </div>
+    </section>
+  
+    <!-- RECIPES GRID -->
+    <section *ngIf="recipes().length" class="recipes-section text-center">
+      <div class="row row-cols-1 row-cols-md-3 g-4 justify-content-center">
+        <div class="col" *ngFor="let r of recipes()">
+          <app-recipe-card [recipe]="r" [compact]="false"></app-recipe-card>
+        </div>
+      </div>
+    </section>
+  </div>
