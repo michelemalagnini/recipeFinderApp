@@ -18,3 +18,7 @@
   .alert {
     max-width: 400px;
   }
+  a.d-block:hover {
+    cursor: pointer;
+    filter: brightness(0.95);
+  }

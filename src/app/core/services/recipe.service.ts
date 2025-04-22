@@ -1,7 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { RecipeResponse } from '../models/recipe.model';
+import { map, Observable } from 'rxjs';
+import { RecipeDetailDto, RecipeResponse } from '../models/recipe.model';
+import { RecipeDetailMapper } from '../recipe-detail.mapper';
 
 @Injectable({ providedIn: 'root' })
 export class RecipeService {
@@ -12,7 +13,15 @@ export class RecipeService {
     return this.http.get<RecipeResponse>(`${this.apiUrl}search.php?s=${query}`);
   }
 
-  getRecipeById(id: string): Observable<RecipeResponse> {
-    return this.http.get<RecipeResponse>(`${this.apiUrl}lookup.php?i=${id}`);
+  getRecipeById(id: string): Observable<RecipeDetailDto> {
+    return this.http
+      .get<RecipeResponse>(`${this.apiUrl}lookup.php?i=${id}`)
+      .pipe(
+        map(res => {
+          const raw = res.meals?.[0];
+          if (!raw) throw new Error('Recipe not found');
+          return RecipeDetailMapper.toDto(raw);
+        })
+      );
   }
 }

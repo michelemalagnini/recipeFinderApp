@@ -17,3 +17,7 @@ export interface Recipe extends BaseRecipe {
 export interface RecipeResponse {
   meals: Recipe[] | null;
 }
+
+export interface RecipeDetailDto extends Recipe {
+  ingredients: string[];
+}
