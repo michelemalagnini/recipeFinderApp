@@ -8,7 +8,7 @@ import { BaseRecipe } from '../core/models/recipe.model';
   standalone: true,
   imports: [CommonModule, RouterModule],
   template: `
-    <div class="card card-main h-100">
+    <div class="card card-main h-100" style="cursor: pointer;" [routerLink]="['/recipe', recipe.idMeal]">
       <img *ngIf="!compact" [src]="recipe.strMealThumb" class="card-img-top" [alt]="recipe.strMeal">
       <div class="card-body text-center">
         <h6 *ngIf="compact" class="card-title mb-2 text-truncate">{{ recipe.strMeal }}</h6>
@@ -18,7 +18,7 @@ import { BaseRecipe } from '../core/models/recipe.model';
         </a>
 
         <button *ngIf="showRemoveButton"
-                (click)="onRemove()"
+                (click)="onRemove($event)"
                 class="btn btn-outline-danger btn-sm">
           Remove
         </button>
@@ -70,7 +70,8 @@ export class RecipeCardComponent {
   @Input() showRemoveButton = false;
   @Output() remove = new EventEmitter<string>();
 
-  onRemove() {
+  onRemove(event : MouseEvent) {
+    event.stopPropagation(); 
     this.remove.emit(this.recipe.idMeal);
   }
 }
