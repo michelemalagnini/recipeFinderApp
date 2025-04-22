@@ -1,5 +1,5 @@
 import { Injectable, signal, computed } from '@angular/core';
-import { BaseRecipe } from './models/recipe.model';
+import { BaseRecipe } from '../models/recipe.model';
 
 
 @Injectable({ providedIn: 'root' })

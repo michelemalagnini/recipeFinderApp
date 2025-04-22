@@ -3,8 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
 
-import { RecipeService } from '../core/recipe.service';
-import { FavoritesService } from '../core/favorites.service';
+import { RecipeService } from '../core/services/recipe.service';
+import { FavoritesService } from '../core/services/favorites.service';
 
 import { NavbarComponent } from '../shared/navbar.component';
 import { SearchFormComponent } from '../shared/search-form.component';

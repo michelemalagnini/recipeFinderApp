@@ -1,5 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
-import { FavoritesService } from '../core/favorites.service';
+import { FavoritesService } from '../core/services/favorites.service';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { RecipeCardComponent } from '../shared/recipe-card.component';
