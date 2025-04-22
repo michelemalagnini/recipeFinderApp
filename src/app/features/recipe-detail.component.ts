@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { RecipeService } from '../core/recipe.service';
 import { FavoritesService } from '../core/favorites.service';
 import { SkeletonRecipeDetailComponent } from '../shared/skeleton-recipe-detail.component';
-import { Recipe, RecipeResponse } from '../core/recipe.model';
+import { Recipe, RecipeResponse } from '../core/models/recipe.model';
 import { FlagService } from '../core/coreFlag.service';
 import { switchMap, throwError } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';

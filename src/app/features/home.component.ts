@@ -11,7 +11,7 @@ import { SearchFormComponent } from '../shared/search-form.component';
 import { RecipeCardComponent } from '../shared/recipe-card.component';
 import { SkeletonCardComponent } from '../shared/skeleton-card.component';
 
-import { Recipe, RecipeResponse } from '../core/recipe.model';
+import { Recipe, RecipeResponse } from '../core/models/recipe.model';
 
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 

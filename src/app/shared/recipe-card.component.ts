@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { BaseRecipe } from '../core/recipe.model';
+import { BaseRecipe } from '../core/models/recipe.model';
 
 @Component({
   selector: 'app-recipe-card',
