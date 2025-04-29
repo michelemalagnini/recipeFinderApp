@@ -63,4 +63,4 @@ The first time, this command builds the application and opens your browser at ht
 ## 🌐 Live Demo
 
 The application has been deployed and is available for public viewing. Check it out at:
-(recipe-finder-n1cxl205v-michelemalagninis-projects.vercel.app)
+(https://recipe-finder-app-liart.vercel.app)
