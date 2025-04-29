@@ -19,7 +19,8 @@ export class RecipeService {
       .pipe(
         map(res => {
           const raw = res.meals?.[0];
-          if (!raw) throw new Error('Recipe not found');
+          const isArray = Array.isArray(raw);
+          if (!raw || !isArray) throw new Error('Recipe not found');
           return RecipeDetailMapper.toDto(raw);
         })
       );
